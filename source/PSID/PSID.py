@@ -227,7 +227,6 @@ def PSID(Y, Z=None, nx=None, n1=0, i=None, WS=dict(), return_WS=False, fit_Cz_vi
         if nz > 0:
             WS['zSamples'] = zSamples
             WS['Z1'] = z1
-
     if 'Yp' not in WS or WS['Yp'] is None:
         WS['Yp'] = blkhankskip(Y, i, N, time_first=time_first)
         WS['Yii'] = blkhankskip(Y, 1, N, i, time_first=time_first)
@@ -261,8 +260,12 @@ def PSID(Y, Z=None, nx=None, n1=0, i=None, WS=dict(), return_WS=False, fit_Cz_vi
         Xk_Plus1 = np.linalg.pinv(Oz_Minus) @ WS['ZHatMinus'];   # Eq. (16)
     else:
         n1 = 0
-        Xk = np.empty([0, N])
-        Xk_Plus1 = np.empty([0, N])
+        if isinstance(N,(list,tuple)):
+            _N = sum(N)
+        else:
+            _N = N
+        Xk = np.empty([0, _N])
+        Xk_Plus1 = np.empty([0, _N])
     
     # Stage 2
     n2 = nx - n1     
@@ -305,6 +308,7 @@ def PSID(Y, Z=None, nx=None, n1=0, i=None, WS=dict(), return_WS=False, fit_Cz_vi
 
     
     # Parameter identification
+    print('PSID fit: parameter ID')
     if n1 > 0:
         # A associated with the z-related states
         A = projOrth( Xk_Plus1[:n1, :], Xk[:n1, :] )[1]              # Eq. (17)
